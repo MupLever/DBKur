@@ -33,7 +33,7 @@ for i in range(1, 26):
             "fullname": f"{fake.last_name_male()} {fake.first_name_male()} {fake.random_element(patronymics)}",
             "birthdate": fake.date(pattern="%Y-%m-%d"),
             "address": fake.address(),
-            "e-mail": fake.email(),
+            "email": fake.email(),
             "education": fake.random_element(
                 [
                     "Дошкольное",
@@ -67,7 +67,7 @@ for i in range(1, 26):
             "title": fake.text(),
             "author": fake.random_element(authors),
             "publishing_house": ["Эксмо", "АСТ"],
-            "year_issue": fake.year(),
+            "year_issue": int(fake.year()),
             "language": fake.language_name(),
             "shelf": "Классика",
             "issue": [

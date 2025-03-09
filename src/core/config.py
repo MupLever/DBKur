@@ -3,10 +3,10 @@ import os
 from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from src.mixins.model_mixin import BaseModelMixin
+from src.mixins.model_mixin import LowerCaseMixin
 
 
-class PostgresConfig(BaseModelMixin):
+class PostgresConfig(LowerCaseMixin):
     HOST: str = Field(default="localhost")
     PORT: int = Field(default=5432)
     DBNAME: str = Field(default="postgres")
@@ -14,12 +14,12 @@ class PostgresConfig(BaseModelMixin):
     PASSWORD: str = Field(default="postgres")
 
 
-class ElasticConfig(BaseModelMixin):
+class ElasticConfig(LowerCaseMixin):
     HOST: str = Field(default="localhost")
     PORT: int = Field(default=9200)
 
 
-class Neo4jConfig(BaseModelMixin):
+class Neo4jConfig(LowerCaseMixin):
     HOST: str = Field(default="localhost")
     PORT: int = Field(default=7687)
     USER: str = Field(default="neo4j", exclude=True)
@@ -31,12 +31,12 @@ class Neo4jConfig(BaseModelMixin):
         return self.USER, self.PASSWORD
 
 
-class HadoopConfig(BaseModelMixin):
+class HadoopConfig(LowerCaseMixin):
     HOST: str = Field(default="localhost")
     PORT: int = Field(default=9000)
 
 
-class SparkConfig(BaseModelMixin):
+class SparkConfig(LowerCaseMixin):
     HOST: str = Field(default="localhost")
     PORT: int = Field(default=7077)
     HADOOP_CONFIG: HadoopConfig = HadoopConfig()

@@ -1,9 +1,7 @@
 from sentence_transformers import SentenceTransformer
 
-from src.common.job import BaseJob
 
-
-class JobInsertTable(BaseJob):
+class InsertValuesScript:
     def __init__(self, client, data):
         self.client = client
         self.data = data
@@ -11,14 +9,14 @@ class JobInsertTable(BaseJob):
         # Загрузка модели для преобразования текста в векторы
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
-    def _(self):
+    def transform_doc_to_vector(self):
         """Преобразование документов в векторы"""
         texts = ["".format() for doc in self.data]
         vectors = self.model.encode(texts).tolist()
         return vectors
 
     def run(self):
-        vectors = self._()
+        vectors = self.transform_doc_to_vector()
         with self.client.cursor() as cur:
             # Сохранение векторов в базу данных
             for doc, vector in zip(self.data, vectors):

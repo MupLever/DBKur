@@ -1,19 +1,7 @@
 from pyspark.sql.types import StructType, StructField, IntegerType, StringType, DateType
 
-# Schemas для Читателей и Книг
-ReadersSchema = StructType(
-    [
-        StructField("id", IntegerType(), False),
-        StructField("registration_date", StringType(), False),
-        StructField("fullname", StringType(), False),
-        StructField("birthdate", StringType(), False),
-        StructField("address", StringType(), False),
-        StructField("e-mail", StringType(), False),
-        StructField("education", StringType(), False),
-    ]
-)
-
-BooksSchema = StructType(
+# Schema для Книг
+BookSchema = StructType(
     [
         StructField("id", IntegerType(), False),
         StructField("reader_id", IntegerType(), False),

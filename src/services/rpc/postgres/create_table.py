@@ -1,14 +1,9 @@
-from src.common.job import BaseJob
-
-
-class JobCreateTable(BaseJob):
-    """Интерфейс для реализации Job'ов"""
-
-    def __init__(self, client):
-        self.client = client
+class CreateTableScript:
+    def __init__(self, db):
+        self.db = db
 
     def run(self):
-        with self.client.cursor() as cur:
+        with self.db.cursor() as cur:
             cur.execute("DROP TABLE IF EXISTS readers;")
             cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
             cur.execute(
@@ -25,4 +20,4 @@ class JobCreateTable(BaseJob):
             )
 
         # Сохранение изменений
-        self.client.commit()
+        self.db.commit()

@@ -3,13 +3,16 @@ from typing import Any, Generator
 
 import psycopg2
 from elasticsearch import Elasticsearch
+from psycopg2._psycopg import connection
 from py2neo import Graph
 from pyspark.sql import SparkSession
 
 
 # dependency
 @contextmanager
-def elastic_client(*, host: str = "localhost", port: int = 9200) -> Generator[Elasticsearch, Any, None]:
+def elastic_client(
+    *, host: str = "localhost", port: int = 9200
+) -> Generator[Elasticsearch, Any, None]:
     with Elasticsearch(f"http://{host}:{port}/") as client:
         yield client
 
@@ -49,6 +52,6 @@ def pg_client(
     dbname="postgres",
     user="postgres",
     password="postgres",
-):
+) -> Generator[connection, Any, None]:
     with psycopg2.connect(f"{host=} {port=} {dbname=} {user=} {password=}") as client:
         yield client

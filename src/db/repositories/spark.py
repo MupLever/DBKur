@@ -1,7 +1,8 @@
 from pyspark.sql import SparkSession, DataFrame
 
 from core.config import SparkConfig
-from src.spark.schemas import ReadersSchema, BooksSchema
+from db.schemas.spark.book import BookSchema
+from db.schemas.spark.reader import ReaderSchema
 
 
 class BaseSparkRepository:
@@ -54,11 +55,11 @@ class ReaderSparkRepository(BaseSparkRepository):
     """"""
 
     index = "readers"
-    schema = ReadersSchema
+    schema = ReaderSchema
 
 
 class BookSparkRepository(BaseSparkRepository):
     """"""
 
     index = "books"
-    schema = BooksSchema
+    schema = BookSchema
