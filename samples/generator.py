@@ -29,9 +29,9 @@ for i in range(1, 26):
         "doc_type": "reader",
         "id": i,
         "body": {
-            "registration_date": fake.date(pattern="%Y-%m-%d"),
+            "registration_date": fake.date(),
             "fullname": f"{fake.last_name_male()} {fake.first_name_male()} {fake.random_element(patronymics)}",
-            "birthdate": fake.date(pattern="%Y-%m-%d"),
+            "birthdate": fake.date(),
             "address": fake.address(),
             "email": fake.email(),
             "education": fake.random_element(
@@ -73,9 +73,9 @@ for i in range(1, 26):
             "issue": [
                 {
                     "reader_id": random.randint(1, 25),
-                    "issue_date": fake.date(pattern="%Y-%m-%d"),
-                    "return_date": fake.date(pattern="%Y-%m-%d"),
-                    "return_factual_date": fake.date(pattern="%Y-%m-%d"),
+                    "issue_date": fake.date(),
+                    "return_date": fake.date(),
+                    "return_factual_date": fake.date(),
                 }
             ],
         },

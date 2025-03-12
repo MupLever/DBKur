@@ -58,9 +58,9 @@ book_mappings = {
                 "type": "nested",
                 "properties": {
                     "reader_id": {"type": "keyword"},
-                    "issue_date": {"type": "date", "format": "yyyy-MM-dd"},
-                    "return_date": {"type": "date", "format": "yyyy-MM-dd"},
-                    "return_factual_date": {"type": "date", "format": "yyyy-MM-dd"},
+                    "issue_date": {"type": "keyword"},
+                    "return_date": {"type": "keyword"},
+                    "return_factual_date": {"type": "keyword"},
                 },
             },
         }
@@ -80,7 +80,7 @@ class BaseElasticRepository:
         try:
             db.indices.create(index=self.index, body=self.mappings)
         except BadRequestError:
-            print(f"{self.index} already exists")
+            pass
 
     def get_all(self, **kwargs):
         return [
@@ -89,7 +89,8 @@ class BaseElasticRepository:
         ]
 
     def create(self, *, document_id: str, body: dict):
-        return self.db.index(index=self.index, id=document_id, body=body)
+        self.db.index(index=self.index, id=document_id, body=body)
+        print(f"Added doc {document_id} to {self.index}")
 
     def delete(self, instance_id):
         self.db.delete(index=self.index, id=instance_id)
