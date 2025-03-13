@@ -1,5 +1,5 @@
-from db.repositories.elastic import ReaderElasticRepository
-from mixins.base_service import BaseService
+from db.repositories.elastic.reader import ReaderElasticRepository
+from services.elastic.base_service import BaseService
 
 
 class ReaderElasticService(BaseService):

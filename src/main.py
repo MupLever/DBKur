@@ -4,20 +4,19 @@ from pathlib import Path
 from pprint import pprint
 from typing import Generator, Any
 
-from pyspark.sql.functions import col
-
 from core.config import settings
 from core.database import elastic_client, pg_client, spark_client, neo4j_client
-from db.repositories.spark import ReaderSparkRepository, BookSparkRepository
 from services.elastic.reader import ReaderElasticService
 from services.elastic.book import BookElasticService
-from services.rpc.neo4j.create_graph import CreateGraphScript
-from services.rpc.neo4j.get_readable_writer import GetReadableWriterScript
-from services.rpc.postgres.create_table import CreateTableScript
-from services.rpc.postgres.get_similar_vectors import GetSimilarVectorsScript
-from services.rpc.postgres.insert_values import InsertValuesScript
+from services.scripts.neo4j.create_graph import CreateGraphScript
+from services.scripts.neo4j.get_readable_writer import GetReadableWriterScript
+from services.scripts.spark.get_debtors import GetDebtorsScript
+from services.spark.book import BookSparkService
+from services.spark.reader import ReaderSparkService
 
-samples_path = Path(__file__).parent.parent / "samples"
+from services.scripts.postgres.create_table import CreateTableScript
+from services.scripts.postgres.get_similar_vectors import GetSimilarVectorsScript
+from services.scripts.postgres.insert_values import InsertValuesScript
 
 
 def get_data(filename: str | Path) -> Generator[Any, Any, None]:
@@ -32,10 +31,10 @@ if __name__ == "__main__":
             index_name = index["index"]
             es_client.indices.delete(index=index_name, ignore_unavailable=True)
 
-        for reader_data in get_data(samples_path / "readers.jsonl"):
+        for reader_data in get_data(settings.SAMPLES_PATH / "readers.jsonl"):
             ReaderElasticService(es_client).create(reader_data)
 
-        for book_data in get_data(samples_path / "books.jsonl"):
+        for book_data in get_data(settings.SAMPLES_PATH / "books.jsonl"):
             BookElasticService(es_client).create(book_data)
 
         pprint(BookElasticService(es_client).get_expired_books())
@@ -52,41 +51,24 @@ if __name__ == "__main__":
 
     # Сохранение в HDFS
     with spark_client(**settings.SPARK_CONFIG.model_dump(by_alias=True)) as spark:
-        # TODO: перевести на сервисы
         readers_values = [(reader.model_dump().values()) for reader in readers]
-        books_values = []
-        for book in books:
-            for issue in book.issue:
-                books_values.append(
-                    (
-                        book.id,
-                        book.title,
-                        book.author,
-                        issue.reader_id,
-                        issue.return_date,
-                        issue.return_factual_date,
-                    )
-                )
+        BookSparkService(spark, settings.SPARK_CONFIG).bulk_insert(readers_values)
 
-        readers_repo = ReaderSparkRepository(spark)
-        books_repo = BookSparkRepository(spark)
+        books_values = [
+            (
+                book.id,
+                book.title,
+                book.author,
+                issue.reader_id,
+                issue.return_date,
+                issue.return_factual_date,
+            )
+            for book in books
+            for issue in book.issue
+        ]
+        ReaderSparkService(spark, settings.SPARK_CONFIG).bulk_insert(books_values)
 
-        readers_repo.create(readers_values)
-        books_repo.create(books_values)
-
-        readers_df = readers_repo.get_all()
-        books_df = books_repo.get_all()
-
-        # Преобразуем данные для поиска задолженности
-        debtors_df = readers_df.join(
-            books_df, on=readers_df["read_book_id"] == books_df["id"], how="inner"
-        ).filter(
-            (col("issue.return_factual_date").isNull())
-            | (col("issue.return_factual_date") > col("issue.return_date"))
-        )
-
-        # Показать результаты
-        debtors_df.show()
+        GetDebtorsScript(spark, settings.SPARK_CONFIG).run().show()
 
     with pg_client(**settings.PG_CONFIG.model_dump(by_alias=True)) as pg_client:
         CreateTableScript(pg_client).run()

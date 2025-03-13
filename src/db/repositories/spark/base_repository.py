@@ -1,25 +1,23 @@
 from pyspark.sql import SparkSession, DataFrame
 
-from core.config import SparkConfig
-from db.schemas.spark.book import BookSchema
-from db.schemas.spark.reader import ReaderSchema
+from core.config import HadoopConfig
 
 
 class BaseSparkRepository:
     index = None
     schema = None
 
-    def __init__(self, client: SparkSession, config: SparkConfig) -> None:
+    def __init__(self, client: SparkSession, config: HadoopConfig) -> None:
         self.client = client
         self.config = config
 
-    def create(self, values) -> None:
+    def bulk_insert(self, values: list) -> None:
         df = self.client.createDataFrame(values, self.schema)
         try:
             existing_df = self.client.read.csv(
                 path="hdfs://{host}:{port}/{index}.csv".format(
-                    host=self.config.HADOOP_CONFIG.HOST,
-                    port=self.config.HADOOP_CONFIG.PORT,
+                    host=self.config.HOST,
+                    port=self.config.PORT,
                     index=self.index,
                 ),
                 header=True,
@@ -31,8 +29,8 @@ class BaseSparkRepository:
 
         df.write.csv(
             path="hdfs://{host}:{port}/{index}.csv".format(
-                host=self.config.HADOOP_CONFIG.HOST,
-                port=self.config.HADOOP_CONFIG.PORT,
+                host=self.config.HOST,
+                port=self.config.PORT,
                 index=self.index,
             ),
             mode="overwrite",
@@ -42,24 +40,10 @@ class BaseSparkRepository:
     def get_all(self) -> DataFrame:
         return self.client.read.csv(
             path="hdfs://{host}:{port}/{index}.csv".format(
-                host=self.config.HADOOP_CONFIG.HOST,
-                port=self.config.HADOOP_CONFIG.PORT,
+                host=self.config.HOST,
+                port=self.config.PORT,
                 index=self.index,
             ),
             header=True,
             inferSchema=True,
         )
-
-
-class ReaderSparkRepository(BaseSparkRepository):
-    """"""
-
-    index = "readers"
-    schema = ReaderSchema
-
-
-class BookSparkRepository(BaseSparkRepository):
-    """"""
-
-    index = "books"
-    schema = BookSchema

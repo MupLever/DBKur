@@ -44,6 +44,7 @@ def spark_client() -> Generator[SparkSession, Any, None]:
             client.stop()
 
 
+# dependency
 @contextmanager
 def pg_client(
     *,

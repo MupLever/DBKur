@@ -1,5 +1,5 @@
-from db.repositories.elastic import BookElasticRepository
-from mixins.base_service import BaseService
+from db.repositories.elastic.book import BookElasticRepository
+from services.elastic.base_service import BaseService
 
 
 class BookElasticService(BaseService):

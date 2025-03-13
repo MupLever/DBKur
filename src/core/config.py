@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -47,6 +48,10 @@ class Settings(BaseSettings):
     ES_CONFIG: ElasticConfig = ElasticConfig()
     NEO4J_CONFIG: Neo4jConfig = Neo4jConfig()
     SPARK_CONFIG: SparkConfig = SparkConfig()
+
+    @property
+    def SAMPLES_PATH(self):
+        return Path(__file__).resolve().parent.parent.parent / "samples"
 
     model_config = SettingsConfigDict(
         extra="ignore",
