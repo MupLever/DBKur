@@ -27,9 +27,10 @@ def get_data(filename: str | Path) -> Generator[Any, Any, None]:
 
 if __name__ == "__main__":
     with elastic_client(**settings.ES_CONFIG.model_dump(by_alias=True)) as es_client:
-        for index in es_client.cat.indices(format="json"):
-            index_name = index["index"]
-            es_client.indices.delete(index=index_name, ignore_unavailable=True)
+        indices_names = [
+            index["index"] for index in es_client.cat.indices(format="json")
+        ]
+        es_client.indices.delete(index=indices_names, ignore_unavailable=True)
 
         for reader_data in get_data(settings.SAMPLES_PATH / "readers.jsonl"):
             ReaderElasticService(es_client).create(reader_data)
@@ -52,7 +53,9 @@ if __name__ == "__main__":
     # Сохранение в HDFS
     with spark_client(**settings.SPARK_CONFIG.model_dump(by_alias=True)) as spark:
         readers_values = [(reader.model_dump().values()) for reader in readers]
-        BookSparkService(spark, settings.SPARK_CONFIG).bulk_insert(readers_values)
+        BookSparkService(spark, settings.SPARK_CONFIG.HADOOP_CONFIG).bulk_insert(
+            readers_values
+        )
 
         books_values = [
             (
@@ -66,9 +69,11 @@ if __name__ == "__main__":
             for book in books
             for issue in book.issue
         ]
-        ReaderSparkService(spark, settings.SPARK_CONFIG).bulk_insert(books_values)
+        ReaderSparkService(spark, settings.SPARK_CONFIG.HADOOP_CONFIG).bulk_insert(
+            books_values
+        )
 
-        GetDebtorsScript(spark, settings.SPARK_CONFIG).run().show()
+        GetDebtorsScript(spark, settings.SPARK_CONFIG.HADOOP_CONFIG).run().show()
 
     with pg_client(**settings.PG_CONFIG.model_dump(by_alias=True)) as pg_client:
         CreateTableScript(pg_client).run()

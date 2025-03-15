@@ -4,7 +4,7 @@ from pathlib import Path
 from pydantic import Field, computed_field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-from src.mixins.model_mixin import LowerCaseMixin
+from mixins.model_mixin import LowerCaseMixin
 
 
 class PostgresConfig(LowerCaseMixin):
@@ -27,8 +27,7 @@ class Neo4jConfig(LowerCaseMixin):
     PASSWORD: str = Field(default="test", exclude=True)
 
     @computed_field
-    @property
-    def auth(self) -> tuple[str, ...]:
+    def auth(self) -> tuple[str, str]:
         return self.USER, self.PASSWORD
 
 
@@ -50,7 +49,7 @@ class Settings(BaseSettings):
     SPARK_CONFIG: SparkConfig = SparkConfig()
 
     @property
-    def SAMPLES_PATH(self):
+    def SAMPLES_PATH(self) -> Path:
         return Path(__file__).resolve().parent.parent.parent / "samples"
 
     model_config = SettingsConfigDict(

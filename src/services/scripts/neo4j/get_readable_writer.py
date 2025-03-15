@@ -1,8 +1,11 @@
+from py2neo import Graph
+
+
 class GetReadableWriterScript:
-    def __init__(self, db):
+    def __init__(self, db: Graph) -> None:
         self.db = db
 
-    def run(self):
+    def run(self) -> None:
         try:
             result = self.db.run(
                 """

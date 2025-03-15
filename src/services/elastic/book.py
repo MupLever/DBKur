@@ -1,21 +1,13 @@
+from typing import Any
+
 from db.repositories.elastic.book import BookElasticRepository
-from services.elastic.base_service import BaseService
+from db.schemas.elastic.book import BookSchema
+from services.elastic.base_service import BaseElasticService
 
 
-class BookElasticService(BaseService):
-    def get_all(self, size):
-        return BookElasticRepository(self.db).get_all(size=size)
+class BookElasticService(BaseElasticService[BookElasticRepository, BookSchema]):
+    repository = BookElasticRepository
+    schema = BookSchema
 
-    def get_expired_books(self):
-        return BookElasticRepository(self.db).get_expired_books()
-
-    def create(self, data):
-        try:
-            BookElasticRepository(self.db).create(
-                document_id=data["id"], body=data["body"]
-            )
-        except Exception as exc:
-            print(f"Create document error: {exc}")
-
-    def delete(self, instance_id):
-        BookElasticRepository(self.db).delete(instance_id)
+    def get_expired_books(self) -> Any:
+        return self.repository(self.db).get_expired_books()

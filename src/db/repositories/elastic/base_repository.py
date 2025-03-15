@@ -1,7 +1,9 @@
+from typing import Any
+
 from elasticsearch import Elasticsearch, BadRequestError
 
 ANALYZER_NAME = "custom_analyzer"
-analyzer = {
+analyzer: dict[str, Any] = {
     "settings": {
         "analysis": {
             "filter": {
@@ -21,11 +23,10 @@ analyzer = {
 
 
 class BaseElasticRepository:
-    index = None
-    mappings = None
-    schema = None
+    index: str
+    mappings: dict[str, Any]
 
-    def __init__(self, db: Elasticsearch):
+    def __init__(self, db: Elasticsearch) -> None:
         self.db = db
 
         try:
@@ -33,15 +34,12 @@ class BaseElasticRepository:
         except BadRequestError:
             pass
 
-    def get_all(self, **kwargs):
-        return [
-            self.schema(id=data["_id"], **data["_source"])
-            for data in self.db.search(index=self.index, **kwargs).body["hits"]["hits"]
-        ]
+    def get_all(self, **kwargs: Any) -> list[dict[str, Any]]:
+        return self.db.search(index=self.index, **kwargs).body["hits"]["hits"]
 
-    def create(self, *, document_id: str, body: dict):
+    def create(self, *, document_id: str, body: dict[str, Any]) -> None:
         self.db.index(index=self.index, id=document_id, body=body)
         print(f"Added doc {document_id} to {self.index}")
 
-    def delete(self, instance_id):
+    def delete(self, instance_id: str) -> None:
         self.db.delete(index=self.index, id=instance_id)

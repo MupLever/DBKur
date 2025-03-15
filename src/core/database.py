@@ -23,7 +23,7 @@ def neo4j_client(
     *,
     host: str = "localhost",
     port: int = 7687,
-    auth: tuple = ("neo4j", "test"),
+    auth: tuple[str, str] = ("neo4j", "test"),
 ) -> Generator[Graph, Any, None]:
     try:
         client = Graph(f"bolt://{host}:{port}", auth=auth)

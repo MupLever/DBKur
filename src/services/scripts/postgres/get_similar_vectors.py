@@ -1,8 +1,11 @@
+from psycopg2._psycopg import connection
+
+
 class GetSimilarVectorsScript:
-    def __init__(self, db):
+    def __init__(self, db: connection) -> None:
         self.db = db
 
-    def run(self):
+    def run(self) -> None:
         with self.db.cursor() as cur:
             # Поиск 3 ближайших документов
             cur.execute(

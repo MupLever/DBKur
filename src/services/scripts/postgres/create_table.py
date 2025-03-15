@@ -1,8 +1,11 @@
+from psycopg2._psycopg import connection
+
+
 class CreateTableScript:
-    def __init__(self, db):
+    def __init__(self, db: connection) -> None:
         self.db = db
 
-    def run(self):
+    def run(self) -> None:
         with self.db.cursor() as cur:
             cur.execute("DROP TABLE IF EXISTS readers;")
             cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")

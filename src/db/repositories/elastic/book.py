@@ -1,12 +1,13 @@
+from typing import Any
+
 from db.repositories.elastic.base_repository import (
     BaseElasticRepository,
     ANALYZER_NAME,
     analyzer,
 )
 from db.schemas.elastic.book import BookSchema
-from services.elastic.queries import expired_books
 
-book_mappings = {
+book_mappings: dict[str, Any] = {
     "mappings": {
         "properties": {
             "title": {"type": "text", "analyzer": "standard"},
@@ -28,6 +29,31 @@ book_mappings = {
     },
     **analyzer,
 }
+expired_books: dict[str, Any] = {
+    "size": 0,
+    "aggs": {
+        "nested": {
+            "nested": {"path": "issue"},
+            "aggs": {
+                "filtered_issues": {
+                    "filter": {
+                        "range": {
+                            "issue.return_date": {"lt": "issue.return_factual_date"}
+                        }
+                    },
+                    "aggs": {
+                        "books_by_issue_date": {
+                            "terms": {"field": "issue.issue_date"},
+                            "aggs": {
+                                "count": {"value_count": {"field": "issue.reader_id"}}
+                            },
+                        }
+                    },
+                }
+            },
+        }
+    },
+}
 
 
 class BookElasticRepository(BaseElasticRepository):
@@ -35,5 +61,5 @@ class BookElasticRepository(BaseElasticRepository):
     mappings = book_mappings
     schema = BookSchema
 
-    def get_expired_books(self):
+    def get_expired_books(self) -> Any:
         return self.db.search(index=self.index, **expired_books).body

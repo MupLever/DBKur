@@ -1,13 +1,14 @@
+from typing import Any
+
 from db.repositories.elastic.base_repository import (
     BaseElasticRepository,
     ANALYZER_NAME,
     analyzer,
 )
 from db.schemas.elastic.reader import ReaderSchema
-from services.elastic.queries import total_books_read
 
 
-reader_mappings = {
+reader_mappings: dict[str, Any] = {
     "mappings": {
         "properties": {
             "registration_date": {"type": "date"},
@@ -28,11 +29,16 @@ reader_mappings = {
     **analyzer,
 }
 
+total_books_read: dict[str, Any] = {
+    "size": 0,
+    "aggs": {"total_books_read": {"value_count": {"field": "read_book_id"}}},
+}
+
 
 class ReaderElasticRepository(BaseElasticRepository):
     index = "readers"
     mappings = reader_mappings
     schema = ReaderSchema
 
-    def get_total_books_read(self):
+    def get_total_books_read(self) -> Any:
         return self.db.search(index=self.index, **total_books_read).body

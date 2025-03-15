@@ -1,17 +1,22 @@
+from typing import TypeVar, Generic, Any, Iterable
+
 from pyspark.sql import SparkSession, DataFrame
+from pyspark.sql.types import StructType
 
 from core.config import HadoopConfig
 
+Schema = TypeVar("Schema", bound=StructType)
 
-class BaseSparkRepository:
-    index = None
-    schema = None
+
+class BaseSparkRepository(Generic[Schema]):
+    index: str
+    schema: type[Schema]
 
     def __init__(self, client: SparkSession, config: HadoopConfig) -> None:
         self.client = client
         self.config = config
 
-    def bulk_insert(self, values: list) -> None:
+    def bulk_insert(self, values: Iterable[Any]) -> None:
         df = self.client.createDataFrame(values, self.schema)
         try:
             existing_df = self.client.read.csv(
