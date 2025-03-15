@@ -1,3 +1,4 @@
+
 from psycopg2._psycopg import connection
 
 
@@ -12,11 +13,11 @@ class GetSimilarVectorsScript:
                 """
                 SELECT *
                 FROM readers
-                ORDER BY vector <-> (SELECT vector FROM readers LIMIT 1)
+                ORDER BY embedding <-> (SELECT embedding FROM readers LIMIT 1)
                 LIMIT 3
                 OFFSET 1;
                 """
             )
 
-        for row in cur:
-            print(row)
+            for row in cur:
+                print(row)

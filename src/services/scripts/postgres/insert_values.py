@@ -14,26 +14,40 @@ class InsertValuesScript:
         # Загрузка модели для преобразования текста в векторы
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
-    def transform_doc_to_vector(self) -> Any:
+    def _transform_doc_to_vector(self) -> Any:
         """Преобразование документов в векторы"""
-        texts = ["".format() for doc in self.data]
+        texts = [
+            "{registration_date} {fullname} {address} {email} {birthdate} {education}".format(
+                registration_date=doc.registration_date,
+                fullname=doc.fullname,
+                address=doc.address,
+                email=doc.email,
+                birthdate=doc.birthdate,
+                education=doc.education,
+            )
+            for doc in self.data
+        ]
         vectors = self.model.encode(texts).tolist()
         return vectors
 
     def run(self) -> None:
-        vectors = self.transform_doc_to_vector()
+        vectors = self._transform_doc_to_vector()
         with self.db.cursor() as cur:
             # Сохранение векторов в базу данных
             for doc, vector in zip(self.data, vectors):
                 cur.execute(
-                    """INSERT INTO readers (registration_date, fullname, birthdate, education, vector)
-                    VALUES (%s, %s, %s, %s, %s)""",
+                    """
+                    INSERT INTO readers (registration_date, fullname, address, email, birthdate, education, embedding)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s);
+                    """,
                     (
                         doc.registration_date,
                         doc.fullname,
+                        doc.address,
+                        doc.email,
                         doc.birthdate,
                         doc.education,
-                        vector,
+                        str(vector),
                     ),
                 )
         # Сохранение изменений
