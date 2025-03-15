@@ -10,7 +10,7 @@ Schema = TypeVar("Schema", bound=StructType)
 
 class BaseSparkRepository(Generic[Schema]):
     index: str
-    schema: type[Schema]
+    schema: Schema
 
     def __init__(self, client: SparkSession, config: HadoopConfig) -> None:
         self.client = client

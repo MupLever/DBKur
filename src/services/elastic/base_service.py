@@ -1,4 +1,4 @@
-from typing import TypeVar, Generic, Any
+from typing import TypeVar, Generic, Any, Mapping
 
 from elasticsearch import Elasticsearch
 from pydantic import BaseModel
@@ -22,7 +22,7 @@ class BaseElasticService(Generic[Repository, Schema]):
             for data in self.repository(self.db).get_all(size=size)
         ]
 
-    def create(self, data: dict[str, Any]) -> None:
+    def create(self, data: Mapping[str, Any]) -> None:
         try:
             self.repository(self.db).create(document_id=data["id"], body=data["body"])
         except Exception as exc:

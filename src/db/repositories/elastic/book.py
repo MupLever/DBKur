@@ -5,7 +5,7 @@ from db.repositories.elastic.base_repository import (
     ANALYZER_NAME,
     analyzer,
 )
-from db.schemas.elastic.book import BookSchema
+
 
 book_mappings: dict[str, Any] = {
     "mappings": {
@@ -20,9 +20,9 @@ book_mappings: dict[str, Any] = {
                 "type": "nested",
                 "properties": {
                     "reader_id": {"type": "keyword"},
-                    "issue_date": {"type": "keyword"},
-                    "return_date": {"type": "keyword"},
-                    "return_factual_date": {"type": "keyword"},
+                    "issue_date": {"type": "date", "format": "yyyy-MM-dd"},
+                    "return_date": {"type": "date", "format": "yyyy-MM-dd"},
+                    "return_factual_date": {"type": "date", "format": "yyyy-MM-dd"},
                 },
             },
         }
@@ -35,15 +35,18 @@ expired_books: dict[str, Any] = {
         "nested": {
             "nested": {"path": "issue"},
             "aggs": {
-                "filtered_issues": {
-                    "filter": {
-                        "range": {
-                            "issue.return_date": {"lt": "issue.return_factual_date"}
-                        }
-                    },
+                "books_by_issue_date": {
+                    "terms": {"field": "issue.issue_date"},
                     "aggs": {
-                        "books_by_issue_date": {
-                            "terms": {"field": "issue.issue_date"},
+                        "filtered_issues": {
+                            "filter": {
+                                "script": {
+                                    "script": {
+                                        "source": "doc['issue.return_date'].value.isBefore(doc['issue.return_factual_date'].value)",
+                                        "lang": "painless",
+                                    }
+                                }
+                            },
                             "aggs": {
                                 "count": {"value_count": {"field": "issue.reader_id"}}
                             },
@@ -59,7 +62,6 @@ expired_books: dict[str, Any] = {
 class BookElasticRepository(BaseElasticRepository):
     index = "books"
     mappings = book_mappings
-    schema = BookSchema
 
     def get_expired_books(self) -> Any:
         return self.db.search(index=self.index, **expired_books).body

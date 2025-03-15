@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Mapping
 
 from elasticsearch import Elasticsearch, BadRequestError
 
@@ -37,7 +37,7 @@ class BaseElasticRepository:
     def get_all(self, **kwargs: Any) -> list[dict[str, Any]]:
         return self.db.search(index=self.index, **kwargs).body["hits"]["hits"]
 
-    def create(self, *, document_id: str, body: dict[str, Any]) -> None:
+    def create(self, *, document_id: str, body: Mapping[str, Any]) -> None:
         self.db.index(index=self.index, id=document_id, body=body)
         print(f"Added doc {document_id} to {self.index}")
 

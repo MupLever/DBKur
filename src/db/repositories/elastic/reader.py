@@ -5,7 +5,6 @@ from db.repositories.elastic.base_repository import (
     ANALYZER_NAME,
     analyzer,
 )
-from db.schemas.elastic.reader import ReaderSchema
 
 
 reader_mappings: dict[str, Any] = {
@@ -38,7 +37,6 @@ total_books_read: dict[str, Any] = {
 class ReaderElasticRepository(BaseElasticRepository):
     index = "readers"
     mappings = reader_mappings
-    schema = ReaderSchema
 
     def get_total_books_read(self) -> Any:
         return self.db.search(index=self.index, **total_books_read).body

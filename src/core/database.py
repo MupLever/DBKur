@@ -50,9 +50,9 @@ def pg_client(
     *,
     host: str = "localhost",
     port: int = 5432,
-    dbname="postgres",
-    user="postgres",
-    password="postgres",
+    dbname: str = "postgres",
+    user: str = "postgres",
+    password: str = "postgres",
 ) -> Generator[connection, Any, None]:
     with psycopg2.connect(f"{host=} {port=} {dbname=} {user=} {password=}") as client:
         yield client
