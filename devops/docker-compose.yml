@@ -1,12 +1,11 @@
-version: '3.7'
 services:
   elasticsearch:
     image: elasticsearch:8.16.5
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
-      - ES_JAVA_OPTS=-Xms512m -Xmx512m
-      - LICENSE=basic
+      - license=basic
+      - network.host=0.0.0.0
     ports:
       - "9200:9200"
     networks:
@@ -30,16 +29,7 @@ services:
     ports:
       - "7474:7474"
       - "7687:7687"
-    networks:
-      - network
 
-#  spark:
-#    image: bitnami/spark:latest
-#    environment:
-#      - SPARK_MODE=master
-#    ports:
-#      - "8080:8080"
-#
   postgres:
     image: ramsrib/pgvector:16
     environment:
@@ -48,6 +38,7 @@ services:
       - POSTGRES_DB=pgvector_db
     ports:
       - "5432:5432"
+
 networks:
   network:
     driver: bridge

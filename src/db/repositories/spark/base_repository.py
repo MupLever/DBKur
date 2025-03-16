@@ -18,20 +18,6 @@ class BaseSparkRepository(Generic[Schema]):
 
     def bulk_insert(self, values: Iterable[Any]) -> None:
         df = self.client.createDataFrame(values, self.schema)
-        try:
-            existing_df = self.client.read.csv(
-                path="hdfs://{host}:{port}/{index}.csv".format(
-                    host=self.config.HOST,
-                    port=self.config.PORT,
-                    index=self.index,
-                ),
-                header=True,
-                inferSchema=True,
-            )
-            df = existing_df.union(df)
-        except Exception as exc:
-            print(f"File not exists: {exc}")
-
         df.write.csv(
             path="hdfs://{host}:{port}/{index}.csv".format(
                 host=self.config.HOST,

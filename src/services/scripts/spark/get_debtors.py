@@ -1,5 +1,4 @@
 from pyspark.sql import SparkSession, DataFrame
-from pyspark.sql.functions import col
 
 from core.config import HadoopConfig
 from services.spark.book import BookSparkService
@@ -26,10 +25,7 @@ class GetDebtorsScript:
 
         # Преобразуем данные для поиска задолженности
         debtors_df = readers_df.join(
-            books_df, on=readers_df["read_book_id"] == books_df["id"], how="inner"
-        ).filter(
-            (col("issue.return_factual_date").isNull())
-            | (col("issue.return_factual_date") > col("issue.return_date"))
-        )
+            books_df, on=readers_df["id"] == books_df["reader_id"], how="inner"
+        ).filter(books_df["return_factual_date"] > books_df["return_date"])
 
         return debtors_df

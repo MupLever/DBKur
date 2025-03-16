@@ -86,9 +86,12 @@
 
 ## Version
 
-python 3.12
+python 3.9
 
 ## Dependencies
 
 * pydantic==2.10.6
+* elasticsearch==8.16.0
+* pyspark==3.5.3
+* ruff==0.11.0
 * others in [`requirements.txt`](https://github.com/MupLever/DBKur/blob/master/requirements.txt)

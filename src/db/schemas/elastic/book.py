@@ -1,4 +1,5 @@
 import datetime
+from typing import Optional
 
 from pydantic import BaseModel
 
@@ -11,7 +12,7 @@ class IssueSchema(BaseModel):
 
 
 class BookSchema(BaseModel):
-    id: int | None = None
+    id: Optional[int] = None
     title: str
     author: str
     publishing_house: list[str]

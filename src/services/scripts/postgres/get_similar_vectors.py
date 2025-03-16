@@ -1,4 +1,3 @@
-
 from psycopg2._psycopg import connection
 
 

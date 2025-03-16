@@ -6,6 +6,7 @@ from elasticsearch import Elasticsearch
 from psycopg2._psycopg import connection
 from py2neo import Graph
 from pyspark.sql import SparkSession
+import findspark
 
 
 # dependency
@@ -25,16 +26,19 @@ def neo4j_client(
     port: int = 7687,
     auth: tuple[str, str] = ("neo4j", "test"),
 ) -> Generator[Graph, Any, None]:
+    client = None
     try:
         client = Graph(f"bolt://{host}:{port}", auth=auth)
         yield client
     finally:
-        del client
+        if client:
+            del client
 
 
 # dependency
 @contextmanager
 def spark_client() -> Generator[SparkSession, Any, None]:
+    findspark.init()
     client = None
     try:
         client = SparkSession.builder.appName("csv").getOrCreate()

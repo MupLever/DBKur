@@ -1,10 +1,11 @@
 import datetime
+from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
 
 class ReaderSchema(BaseModel):
-    id: int | None = None
+    id: Optional[int] = None
     registration_date: datetime.date
     fullname: str
     birthdate: datetime.date
