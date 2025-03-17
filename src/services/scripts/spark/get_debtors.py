@@ -11,21 +11,17 @@ class GetDebtorsScript:
         self.config = config
 
     def run(self) -> DataFrame:
-        # self.db.sql(
-        #     """
-        #     SELECT r.*
-        #     FROM readers r
-        #     JOIN books b ON r.read_book_id = b.id
-        #     WHERE b.issue.return_factual_date IS NULL
-        #     OR b.issue.return_factual_date > b.issue.return_date;
-        #     """
-        # )
         readers_df = ReaderSparkService(self.db, self.config).get_all()
         books_df = BookSparkService(self.db, self.config).get_all()
 
-        # Преобразуем данные для поиска задолженности
-        debtors_df = readers_df.join(
-            books_df, on=readers_df["id"] == books_df["reader_id"], how="inner"
-        ).filter(books_df["return_factual_date"] > books_df["return_date"])
+        # Преобразуем данные для поиска должников
+        debtors_df = (
+            readers_df.join(
+                books_df, on=readers_df["id"] == books_df["reader_id"], how="inner"
+            )
+            .where(books_df["return_factual_date"] > books_df["return_date"])
+            .select(readers_df["id"], *readers_df.columns[1:])
+            .dropDuplicates(["id"])
+        )
 
         return debtors_df
