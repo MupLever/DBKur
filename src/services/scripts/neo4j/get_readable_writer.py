@@ -10,8 +10,8 @@ class GetReadableWriterScript:
             result = self.db.run(
                 """
                 MATCH (r:Reader)-[:ЧИТАЛ]->(b:Book)
-                RETURN b.Author AS Автор, COUNT(r) AS Число_читателей
-                ORDER BY Число_читателей DESC
+                RETURN b.Author AS author, SIZE(COLLECT(DISTINCT r)) AS readers_count
+                ORDER BY readers_count DESC
                 LIMIT 1
                 """
             )

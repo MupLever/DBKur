@@ -1,6 +1,7 @@
 import random
 import json
 from faker import Faker
+from datetime import date, datetime
 
 # Использование библиотеки Faker для создания читателей и книг
 fake = Faker("ru_RU")
@@ -19,19 +20,24 @@ authors = [
     "Л.Н. Толстой",
     "А.С. Пушкин",
     "Ф.М. Достоевский",
-    "А.Н. Чехов",
+    "А.П. Чехов",
 ]
 # Генерация списка писателей
-readers = []
+start_date = date(1950, 1, 1)
+end_date = date.today()
+readers = {}
 for i in range(1, 26):
+    birthdate = fake.date_between_dates(start_date, end_date)
     reader = {
         "index": "readers",
         "doc_type": "reader",
-        "id": i,
+        "id": str(i),
         "body": {
-            "registration_date": fake.date(),
+            "registration_date": fake.date_between_dates(birthdate, end_date).strftime(
+                "%Y-%m-%d"
+            ),
             "fullname": f"{fake.last_name_male()} {fake.first_name_male()} {fake.random_element(patronymics)}",
-            "birthdate": fake.date(),
+            "birthdate": birthdate.strftime("%Y-%m-%d"),
             "address": fake.address(),
             "email": fake.email(),
             "education": fake.random_element(
@@ -44,9 +50,7 @@ for i in range(1, 26):
                     "Высшее",
                 ]
             ),
-            "read_book_id": [
-                random.randint(1, 25) for _ in range(random.randint(1, 25))
-            ],
+            "read_book_id": [],
             "reader_review": [
                 "Книга очень понравилась, захватывающий сюжет!",
                 "Интересные персонажи и неожиданные повороты.",
@@ -54,15 +58,34 @@ for i in range(1, 26):
         },
     }
 
-    readers.append(reader)
+    readers[i] = reader
 
 # Генерация списка книг
 books = []
-for i in range(1, 26):
+for book_id in range(1, 26):
+    issues = []
+    for reader_id in set([random.randint(1, 25) for _ in range(random.randint(1, 25))]):
+        readers[reader_id]["body"]["read_book_id"].append(book_id)
+        registration_date = datetime.strptime(
+            readers[reader_id]["body"]["registration_date"], "%Y-%m-%d"
+        )
+        issue_date = fake.date_between_dates(registration_date, end_date)
+        issue = {
+            "reader_id": reader_id,
+            "issue_date": issue_date.strftime("%Y-%m-%d"),
+            "return_date": fake.date_between_dates(issue_date, end_date).strftime(
+                "%Y-%m-%d"
+            ),
+            "return_factual_date": fake.date_between_dates(
+                issue_date, end_date
+            ).strftime("%Y-%m-%d"),
+        }
+        issues.append(issue)
+
     book = {
         "index": "books",
         "doc_type": "book",
-        "id": i,
+        "id": str(book_id),
         "body": {
             "title": fake.text(),
             "author": fake.random_element(authors),
@@ -70,14 +93,7 @@ for i in range(1, 26):
             "year_issue": int(fake.year()),
             "language": fake.language_name(),
             "shelf": "Классика",
-            "issue": [
-                {
-                    "reader_id": random.randint(1, 25),
-                    "issue_date": fake.date(),
-                    "return_date": fake.date(),
-                    "return_factual_date": fake.date(),
-                }
-            ],
+            "issue": issues,
         },
     }
 
@@ -85,7 +101,7 @@ for i in range(1, 26):
 
 # Сохранение списков в JL-файлы
 with open("readers.jsonl", "w", encoding="utf-8") as f:
-    for reader in readers:
+    for reader in readers.values():
         f.write(json.dumps(reader, ensure_ascii=False) + "\n")
 
 with open("books.jsonl", "w", encoding="utf-8") as f:

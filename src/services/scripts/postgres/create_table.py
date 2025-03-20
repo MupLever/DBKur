@@ -1,3 +1,4 @@
+import json
 from typing import Any
 
 from psycopg2._psycopg import connection
@@ -51,7 +52,7 @@ class CreateTableScript:
                         doc.email,
                         doc.birthdate,
                         doc.education,
-                        str(vector),
+                        json.dumps(vector),
                     ),
                 )
         # Сохранение изменений
@@ -71,4 +72,5 @@ class CreateTableScript:
             for doc in self.readers
         ]
         vectors = self.model.encode(texts).tolist()
+
         return vectors
