@@ -2,10 +2,13 @@ from py2neo import Graph
 
 
 class GetReadableWriterScript:
+    """Поиск самого читаемого писателя."""
+
     def __init__(self, db: Graph) -> None:
         self.db = db
 
     def run(self) -> None:
+        """Поиск самого читаемого писателя."""
         try:
             result = self.db.run(
                 """

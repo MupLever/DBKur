@@ -25,10 +25,15 @@ def get_data(filename: Union[str, Path]) -> Generator[Any, Any, None]:
 
 if __name__ == "__main__":
     with elastic_client(**settings.ES_CONFIG.model_dump(by_alias=True)) as es_client:
+        # Получение списка индексов
         indices_names = [
-            index["index"] for index in es_client.cat.indices(format="json")
+            index["index"]
+            for index in es_client.cat.indices(format="json")
+            if not index["index"].startswith(".")
         ]
-        es_client.indices.delete(index=indices_names, ignore_unavailable=True)
+        # Удаление индексов
+        if indices_names:
+            es_client.indices.delete(index=indices_names, ignore_unavailable=True)
 
         for reader_data in get_data(settings.SAMPLES_PATH / "readers.jsonl"):
             ReaderElasticService(es_client).create(reader_data)
@@ -39,7 +44,7 @@ if __name__ == "__main__":
         input()
         pprint(BookElasticService(es_client).get_expired_books())
         pprint(ReaderElasticService(es_client).get_total_books_read())
-
+        #
         readers = ReaderElasticService(es_client).get_all(size=25)
         books = BookElasticService(es_client).get_all(size=25)
 
@@ -56,9 +61,9 @@ if __name__ == "__main__":
         readers_values = [
             (
                 reader.id,
-                reader.registration_date,
+                reader.registration_date.strftime("%Y-%m-%d"),
                 reader.fullname,
-                reader.birthdate,
+                reader.birthdate.strftime("%Y-%m-%d"),
                 reader.address,
                 reader.email,
                 reader.education,
@@ -80,9 +85,9 @@ if __name__ == "__main__":
                 book.language,
                 book.shelf,
                 issue.reader_id,
-                issue.issue_date,
-                issue.return_date,
-                issue.return_factual_date,
+                issue.issue_date.strftime("%Y-%m-%d"),
+                issue.return_date.strftime("%Y-%m-%d"),
+                issue.return_factual_date.strftime("%Y-%m-%d"),
             )
             for book in books
             for issue in book.issue

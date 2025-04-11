@@ -8,6 +8,8 @@ from db.schemas.elastic.reader import ReaderSchema
 
 
 class CreateTableScript:
+    """Создание и заполнение таблицы Читателей."""
+
     def __init__(self, db: connection, readers: list[ReaderSchema]) -> None:
         self.db = db
         self.readers = readers
@@ -16,13 +18,13 @@ class CreateTableScript:
         self.model = SentenceTransformer("all-MiniLM-L6-v2")
 
     def run(self) -> None:
+        """Создание и заполнение таблицы Читателей."""
         vectors = self._transform_reader_to_vector()
-        if not vectors:
-            raise
 
         with self.db.cursor() as cur:
             cur.execute("CREATE EXTENSION IF NOT EXISTS vector;")
             cur.execute("DROP TABLE IF EXISTS readers;")
+            # Создание схемы таблицы `Читатель`
             cur.execute(
                 f"""
                 CREATE TABLE readers (
@@ -38,7 +40,7 @@ class CreateTableScript:
                 """
             )
 
-            # Сохранение векторов в базу данных
+            # Сохранение данных в таблицу
             for doc, vector in zip(self.readers, vectors):
                 cur.execute(
                     """
@@ -55,7 +57,7 @@ class CreateTableScript:
                         json.dumps(vector),
                     ),
                 )
-        # Сохранение изменений
+        # Фиксирование изменений
         self.db.commit()
 
     def _transform_reader_to_vector(self) -> Any:

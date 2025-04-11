@@ -5,6 +5,8 @@ from db.schemas.elastic.reader import ReaderSchema
 
 
 class CreateGraphScript:
+    """Создание графа читателей, кинг и связей между ними."""
+
     def __init__(
         self, db: Graph, readers: list[ReaderSchema], books: list[BookSchema]
     ) -> None:
@@ -13,6 +15,7 @@ class CreateGraphScript:
         self.books = books
 
     def run(self) -> None:
+        """Создание графа читателей, кинг и связей между ними."""
         self.db.delete_all()
         reader_nodes = {}
         # Создаем узлы читателей

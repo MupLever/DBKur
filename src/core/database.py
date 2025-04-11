@@ -4,9 +4,9 @@ from typing import Any, Generator
 import psycopg2
 from elasticsearch import Elasticsearch
 from psycopg2._psycopg import connection
+
 from py2neo import Graph
 from pyspark.sql import SparkSession
-import findspark
 
 
 # dependency
@@ -38,7 +38,6 @@ def neo4j_client(
 # dependency
 @contextmanager
 def spark_client() -> Generator[SparkSession, Any, None]:
-    findspark.init()
     client = None
     try:
         client = SparkSession.builder.appName("csv").getOrCreate()

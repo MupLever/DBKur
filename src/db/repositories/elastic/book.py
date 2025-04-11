@@ -6,7 +6,7 @@ from db.repositories.elastic.base_repository import (
     analyzer,
 )
 
-
+# Схема маппинга книги
 book_mappings: dict[str, Any] = {
     "mappings": {
         "properties": {
@@ -29,6 +29,7 @@ book_mappings: dict[str, Any] = {
     },
     **analyzer,
 }
+# Запрос на получение книг с просроченной датой в группировке по дате выдачи
 expired_books: dict[str, Any] = {
     "size": 0,
     "aggs": {
@@ -60,8 +61,10 @@ expired_books: dict[str, Any] = {
 
 
 class BookElasticRepository(BaseElasticRepository):
+    """Репозиторий Книги."""
+
     index = "books"
     mappings = book_mappings
 
     def get_expired_books(self) -> Any:
-        return self.db.search(index=self.index, **expired_books).body
+        return self.db.search(index=self.index, **expired_books)

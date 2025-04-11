@@ -6,6 +6,8 @@ from services.elastic.base_service import BaseElasticService
 
 
 class BookElasticService(BaseElasticService[BookElasticRepository, BookSchema]):
+    """Сервис Книг."""
+
     repository = BookElasticRepository
     schema = BookSchema
 

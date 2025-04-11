@@ -2,10 +2,13 @@ from psycopg2._psycopg import connection
 
 
 class GetSimilarVectorsScript:
+    """Поиск трех похожих читателей."""
+
     def __init__(self, db: connection) -> None:
         self.db = db
 
     def run(self) -> None:
+        """Поиск трех похожих читателей."""
         with self.db.cursor() as cur:
             # Поиск 3 ближайших документов
             cur.execute(

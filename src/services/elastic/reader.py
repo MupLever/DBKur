@@ -6,6 +6,8 @@ from services.elastic.base_service import BaseElasticService
 
 
 class ReaderElasticService(BaseElasticService[ReaderElasticRepository, ReaderSchema]):
+    """Сервис читателя."""
+
     repository = ReaderElasticRepository
     schema = ReaderSchema
 

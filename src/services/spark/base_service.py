@@ -10,6 +10,8 @@ Schema = TypeVar("Schema", bound=StructType)
 
 
 class BaseSparkService(Generic[Schema]):
+    """Generic-класс сервиса для работы со Spark."""
+
     repository: type[BaseSparkRepository[Schema]]
 
     def __init__(self, db: SparkSession, config: HadoopConfig) -> None:

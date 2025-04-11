@@ -16,12 +16,15 @@ patronymics = [
     "Николаевич",
     "Викторович",
 ]
+
+# Авторы
 authors = [
     "Л.Н. Толстой",
     "А.С. Пушкин",
     "Ф.М. Достоевский",
     "А.П. Чехов",
 ]
+
 # Генерация списка писателей
 start_date = date(1950, 1, 1)
 end_date = date.today()
@@ -99,7 +102,7 @@ for book_id in range(1, 26):
 
     books.append(book)
 
-# Сохранение списков в JL-файлы
+# Сохранение списков в JSONL-файлы
 with open("readers.jsonl", "w", encoding="utf-8") as f:
     for reader in readers.values():
         f.write(json.dumps(reader, ensure_ascii=False) + "\n")

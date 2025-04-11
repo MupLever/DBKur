@@ -10,6 +10,8 @@ Schema = TypeVar("Schema", bound=BaseModel)
 
 
 class BaseElasticService(Generic[Repository, Schema]):
+    """Generic-класс сервиса для работы с ES."""
+
     repository: type[Repository]
     schema: type[Schema]
 

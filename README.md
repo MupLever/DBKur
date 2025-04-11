@@ -55,7 +55,7 @@
 **Требование к анализатору**:
 
 1. поля, отмеченные *, разделить на слова
-2. убрать пунктуацию с помощью токенизатора standart (русский)
+2. убрать пунктуацию с помощью токенизатора standard (русский)
 3. перевести все токены в нижний регистр
 4. убрать токены, находящиеся в списке стоп-слов.
 
@@ -90,8 +90,15 @@ python 3.9
 
 ## Dependencies
 
-* pydantic==2.10.6
-* elasticsearch==8.16.0
-* pyspark==3.5.3
-* ruff==0.11.0
-* others in [`requirements.txt`](https://github.com/MupLever/DBKur/blob/master/requirements.txt)
+* pydantic = "2.10.6"
+* email-validator = "2.2.0"
+* pydantic-settings = "2.8.1"
+* elasticsearch = "7.17.0"
+* elastic-transport = "7.16.0"
+* py2neo = "2021.2.4"
+* pyspark = "3.5.3"
+* ruff = "^0.11.5"
+* psycopg2 = "2.9.10"
+* Faker = "37.0.0"
+* python-dotenv = "1.0.1"
+* sentence-transformers = "3.4.1"

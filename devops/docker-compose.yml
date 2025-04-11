@@ -1,6 +1,6 @@
 services:
   elasticsearch:
-    image: elasticsearch:8.16.5
+    image: elasticsearch:7.17.0
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
@@ -12,7 +12,7 @@ services:
       - network
 
   kibana:
-    image: kibana:8.16.5
+    image: kibana:7.17.0
     environment:
       - elasticsearch.hosts=["http://localhost:9200"]
     ports:
